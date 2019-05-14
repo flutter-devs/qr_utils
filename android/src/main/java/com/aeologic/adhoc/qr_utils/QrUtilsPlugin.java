@@ -35,7 +35,7 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
      * Plugin registration.
      */
     private static final String TAG = QrUtilsPlugin.class.getSimpleName();
-    private static final String METHOD_CHANNEL = "camera_utils";
+    private static final String METHOD_CHANNEL = "com.aeologic.adhoc.qr_utils";
     private Result result;
     private int requestID=0;
     private static final int REQUEST_SCAN_QR = 101;
