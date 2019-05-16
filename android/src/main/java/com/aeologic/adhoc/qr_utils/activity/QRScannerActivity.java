@@ -1,149 +1,145 @@
-package android.src.main.java.com.aeologic.adhoc.qr_utils.activity;
+package com.aeologic.adhoc.qr_utils.activity;
 
-import android.Manifest;
-import android.app.Activity;
+
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.aeologic.adhoc.qr_utils.R;
+import com.google.zxing.Result;
 
-import java.io.File;
-import java.util.List;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-
-import static android.app.Activity.RESULT_OK;
+import static com.aeologic.adhoc.qr_utils.utils.Utility.isDrawablesIdentical;
 
 /**
- * QrUtilsPlugin
+ * Created by Deepak on 06-Jul-17.
  */
-public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.ActivityResultListener {
-    /**
-     * Plugin registration.
-     */
-    private static final String TAG = QrUtilsPlugin.class.getSimpleName();
-    private static final String METHOD_CHANNEL = "com.aeologic.adhoc.qr_utils";
-    private Result result;
-    private int requestID=0;
-    private static final int REQUEST_SCAN_QR = 101;
-    private static final int REQUEST_GENERATE_QR = 102;
 
+public class QRScannerActivity extends AppCompatActivity implements View.OnClickListener, ZXingScannerView.ResultHandler {
+    private static final String TAG = QRScannerActivity.class.getSimpleName();
+    private ZXingScannerView mScannerView;
+    private ViewGroup contentFrame;
+    private ImageView flashImg;
 
-    private Activity activity;
+    public static final String QR_CONTENT = "QR_CONTENT";
 
-    public QrUtilsPlugin(Activity activity) {
-        this.activity = activity;
+    @Override
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        setContentView(R.layout.activity_qr_scanner);
+        initViews();
+        /*setupToolbar();
+         setupStatusBarColor();*/
+        mScannerView = new ZXingScannerView(this);
+        contentFrame.addView(mScannerView);
+        flashImg.setOnClickListener(this);
     }
 
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), METHOD_CHANNEL);
-        QrUtilsPlugin cameraPlugin = new QrUtilsPlugin(registrar.activity());
-        registrar.addActivityResultListener(cameraPlugin);
-        channel.setMethodCallHandler(cameraPlugin);
+    private void initViews() {
+        contentFrame = findViewById(R.id.content_frame);
+        flashImg = findViewById(R.id.flash_img);
     }
 
     @Override
-    public void onMethodCall(MethodCall call, final Result result) {
-        this.result = result;
-        if (call.method.equals("scanQR")) {
-            requestID = REQUEST_SCAN_QR;
-            checkPermission();
-        } else if (call.method.equals("generateQR")) {
-            requestID = REQUEST_GENERATE_QR;
-        }
-        else {
-            result.notImplemented();
+    public void onClick(View view) {
+        if (view == flashImg) {
+            if (isDrawablesIdentical(flashImg.getDrawable(), getResources().getDrawable(R.drawable.ic_flash_active))) {
+                flashImg.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_inactive));
+                startFlash(false);
+            } else if (isDrawablesIdentical(flashImg.getDrawable(), getResources().getDrawable(R.drawable.ic_flash_inactive))) {
+                flashImg.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_active));
+                startFlash(true);
+            }
         }
     }
 
-    private void checkPermission() {
-        Dexter.withActivity(activity)
-                .withPermissions(
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
-                if (report.areAllPermissionsGranted()) {
-                    if (requestID == REQUEST_SCAN_QR) {
-                        scanQR();
-                    } else if (requestID == REQUEST_GENERATE_QR) {
-                        generateQR();
-                    }
-                } else {
-                    Toast.makeText(activity, "Please grant all permissions!", Toast.LENGTH_SHORT).show();
+    private void startFlash(boolean status) {
+        mScannerView.setFlash(status);
+    }
+
+    private void setupToolbar() {
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setTitle(getString(R.string.qr_scanner));
+    }
+
+    private void setupStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            //window.setStatusBarColor(getResources().getColor(R.color.blueDark));
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();
+    }
+
+    @Override
+    public void handleResult(Result rawResult) {
+        /*Toast.makeText(this, "Contents = " + rawResult.getText() +
+                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();*/
+        if (rawResult != null) {
+            String qrContent = rawResult.getText();
+            Log.v("CONTENT", "DATA: " + qrContent);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScannerView.resumeCameraPreview(QRScannerActivity.this);
                 }
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }).check();
-    }
-
-    private void generateQR() {
-
-    }
-
-    private void scanQR() {
-        /*mediaStorageDir = new File(Environment.getExternalStorageDirectory(), Constants.IMAGES);
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.e("DIR_CREATION", "Failed to create directory!");
-            }
-        }
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + _CAPTURE_IMAGE_NAME + new SimpleDateFormat(Constants.TIMESTAMP_FORMAT).format(new Date()) + Constants.PNG);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            uri = FileProvider.getUriForFile(activity, activity.getPackageName() + ".flutter.provider", mediaFile);
-            Log.v(TAG, uri.toString());
+            }, 2000);
+            Intent intent = new Intent();
+            intent.putExtra(QR_CONTENT, qrContent);
+            setResult(RESULT_OK, intent);
+            finish();
 
         } else {
-            uri = Uri.fromFile(mediaFile);
+            Toast.makeText(QRScannerActivity.this, getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
+            goToBack();
         }
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        activity.startActivityForResult(intent, REQUEST_CAPTURE_IMAGE);*/
     }
-
-
 
     @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.v(TAG, "onActivityResult()");
-        if (resultCode == RESULT_OK && requestCode == REQUEST_SCAN_QR) {
-            /*if (uri != null && uri.getPath() != null) {
-                result.success(uri.getPath());
-                return true;
-            } else {
-                result.success(null);
-                Toast.makeText(activity, "Process Failed...", Toast.LENGTH_SHORT).show();
-            }*/
+    public void onBackPressed() {
+        goToBack();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                goToBack();
+                break;
         }
-
-        return false;
+        return true;
     }
 
-    private String getPath(Uri uri, String[] projection) {
-        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } else
-            return null;
+    private void goToBack() {
+        finish();
     }
+
 }

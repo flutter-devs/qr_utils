@@ -4,17 +4,22 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.aeologic.adhoc.qr_utils.activity.QRScannerActivity;
+import com.aeologic.adhoc.qr_utils.utils.Utility;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 
@@ -26,6 +31,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 import static android.app.Activity.RESULT_OK;
+import static com.aeologic.adhoc.qr_utils.activity.QRScannerActivity.QR_CONTENT;
 
 /**
  * QrUtilsPlugin
@@ -37,7 +43,7 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
     private static final String TAG = QrUtilsPlugin.class.getSimpleName();
     private static final String METHOD_CHANNEL = "com.aeologic.adhoc.qr_utils";
     private Result result;
-    private int requestID=0;
+    private int requestID = 0;
     private static final int REQUEST_SCAN_QR = 101;
     private static final int REQUEST_GENERATE_QR = 102;
 
@@ -63,8 +69,10 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
             checkPermission();
         } else if (call.method.equals("generateQR")) {
             requestID = REQUEST_GENERATE_QR;
-        }
-        else {
+            String content = call.argument("content");
+            Log.v(TAG,"QR_CONTENT: "+content);
+            generateQR(content);
+        } else {
             result.notImplemented();
         }
     }
@@ -80,11 +88,9 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
                 if (report.areAllPermissionsGranted()) {
                     if (requestID == REQUEST_SCAN_QR) {
                         scanQR();
-                    } else if (requestID == REQUEST_GENERATE_QR) {
-                        generateQR();
                     }
                 } else {
-                    Toast.makeText(activity, "Please grant all permissions!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, activity.getString(R.string.grant_all_permission), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -95,55 +101,53 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
         }).check();
     }
 
-    private void generateQR() {
-
+    private void generateQR(final String content) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final Bitmap qrBmp = Utility.generateQRCode(content);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    qrBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                    final byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    final String qrBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                    activity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Log.v(TAG, "QR_BASE_64: " + qrBase64);
+                            result.success(byteArray);
+                            //qrBmp
+                            //
+                        }
+                    });
+                } catch (Exception e) {
+                    activity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, activity.getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void scanQR() {
-        /*mediaStorageDir = new File(Environment.getExternalStorageDirectory(), Constants.IMAGES);
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.e("DIR_CREATION", "Failed to create directory!");
-            }
-        }
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + _CAPTURE_IMAGE_NAME + new SimpleDateFormat(Constants.TIMESTAMP_FORMAT).format(new Date()) + Constants.PNG);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            uri = FileProvider.getUriForFile(activity, activity.getPackageName() + ".flutter.provider", mediaFile);
-            Log.v(TAG, uri.toString());
-
-        } else {
-            uri = Uri.fromFile(mediaFile);
-        }
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        activity.startActivityForResult(intent, REQUEST_CAPTURE_IMAGE);*/
+        Intent intent = new Intent(activity, QRScannerActivity.class);
+        activity.startActivityForResult(intent, REQUEST_SCAN_QR);
     }
-
-
 
     @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(TAG, "onActivityResult()");
         if (resultCode == RESULT_OK && requestCode == REQUEST_SCAN_QR) {
-            /*if (uri != null && uri.getPath() != null) {
-                result.success(uri.getPath());
-                return true;
+            String content = data != null ? data.getStringExtra(QR_CONTENT) : null;
+            Log.v(TAG, "QR_CONTENT: " + content);
+            if (data != null) {
+                result.success(content);
             } else {
-                result.success(null);
-                Toast.makeText(activity, "Process Failed...", Toast.LENGTH_SHORT).show();
-            }*/
+                Toast.makeText(activity, activity.getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
+            }
         }
-
         return false;
-    }
-
-    private String getPath(Uri uri, String[] projection) {
-        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } else
-            return null;
     }
 }

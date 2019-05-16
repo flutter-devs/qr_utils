@@ -1,118 +1,70 @@
 package com.aeologic.adhoc.qr_utils.utils;
 
 
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.aeologic.adhoc.qr_utils.R;
-import com.google.zxing.Result;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
-/**
- * Created by Deepak on 06-Jul-17.
- */
+import java.util.Hashtable;
 
-public class Utility extends AppCompatActivity implements ZXingScannerView.ResultHandler {
-    private ZXingScannerView mScannerView;
-    private ViewGroup contentFrame;
+public class Utility {
 
-    public static final String QR_CONTENT="QR_CONTENT";
-
-    @Override
-    public void onCreate(Bundle state) {
-        super.onCreate(state);
-        setContentView(R.layout.activity_qr_scanner);
-        initViews();
-        /*setupToolbar();
-         setupStatusBarColor();*/
-        mScannerView = new ZXingScannerView(this);
-        contentFrame.addView(mScannerView);
-    }
-
-    private void initViews() {
-        contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-    }
-
-    private void setupToolbar() {
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(getString(R.string.qr_scanner));
-    }
-
-    private void setupStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            //window.setStatusBarColor(getResources().getColor(R.color.blueDark));
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();
-    }
-
-    @Override
-    public void handleResult(Result rawResult) {
-        /*Toast.makeText(this, "Contents = " + rawResult.getText() +
-                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();*/
-        if (rawResult != null) {
-            String qrContent=rawResult.getText();
-            Log.v("CONTENT","DATA: "+qrContent);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScannerView.resumeCameraPreview(Utility.this);
+    public static Bitmap generateQRCode(String content) throws WriterException {
+        QRCodeWriter writer = new QRCodeWriter();
+        try {
+            BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 384, 384);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
                 }
-            }, 2000);
-            Intent intent = new Intent();
-            intent.putExtra(QR_CONTENT, qrContent);
-            setResult(RESULT_OK, intent);
-            finish();
+            }
+            return bmp;
 
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean isDrawablesIdentical(Drawable drawable1, Drawable drawable2) {
+        Drawable.ConstantState constantState1 = drawable1.getConstantState();
+        Drawable.ConstantState constantState2 = drawable2.getConstantState();
+
+        return (constantState1 != null && constantState2 != null && constantState1.equals(constantState2))
+                || getBitmap(drawable1).sameAs(getBitmap(drawable2));
+    }
+
+    public static Bitmap getBitmap(Drawable drawable) {
+        Bitmap result;
+        if (drawable instanceof BitmapDrawable) {
+            result = ((BitmapDrawable) drawable).getBitmap();
         } else {
-            Toast.makeText(Utility.this, getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
-            goToBack();
+            int width = drawable.getIntrinsicWidth();
+            int height = drawable.getIntrinsicHeight();
+            // Some drawables have no intrinsic width - e.g. solid colours.
+            if (width <= 0) {
+                width = 1;
+            }
+            if (height <= 0) {
+                height = 1;
+            }
+
+            result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(result);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        goToBack();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                goToBack();
-                break;
-        }
-        return true;
-    }
-
-    private void goToBack() {
-        finish();
+        return result;
     }
 }
