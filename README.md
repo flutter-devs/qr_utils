@@ -2,13 +2,13 @@ For help getting started with Flutter, view our online
 [documentation](https://flutter.io/).
 
 
-[![Pub](https://img.shields.io/badge/Pub-0.1.0-orange.svg?style=flat-square)](https://pub.dartlang.org/packages/qr_utils)
+[![Pub](https://img.shields.io/badge/Pub-0.1.1-orange.svg?style=flat-square)](https://pub.dartlang.org/packages/qr_utils)
 
 
 
 # qr_utils
 
-A new Flutter QR scanner and generator plugin.
+A new Flutter QR scanner and generator plugin. This plugin is use for scanning 1D barcode and 2D QR code and generating QR code as well.
 
 ### Implementation in Flutter
 
@@ -25,11 +25,11 @@ import 'package:qr_utils/qr_utils.dart';
 
 ### iOS
 
-<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/screenshot1.jpg"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/screenshot2.jpg"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/screenshot3.jpg">
+<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_ios_1.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_ios_2.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_ios_3.png">
 
 ### Android
 
-<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/screenshot1.jpg"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/screenshot2.jpg"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/screenshot3.jpg">
+<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_android_1.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_android_2.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_android_3.png">
 
 
 ### Usages

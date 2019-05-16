@@ -1,6 +1,6 @@
 name: qr_utils
-description: A new Flutter QR scanner and generator plugin.
-version: 0.1.0
+description: A new Flutter QR scanner and generator plugin. This plugin is use for scanning 1D barcode and 2D QR code and generating QR code as well.
+version: 0.1.1
 authors:
   - Deepak Nishad <deepak@aeologic.com>
   - Anurag Bhatt<anurag@aeologic.com>
