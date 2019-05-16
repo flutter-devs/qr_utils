@@ -64,6 +64,8 @@ extension SwiftQrUtilsPlugin {
     @available(iOS 10.0, *)
     
     func openQRCamera(){
+        
+        if !captureSession.isRunning {
         // Get the back-facing camera for capturing videos
         let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: .back)
         
@@ -75,9 +77,11 @@ extension SwiftQrUtilsPlugin {
         do {
             // Get an instance of the AVCaptureDeviceInput class using the previous device object.
             let input = try AVCaptureDeviceInput(device: captureDevice)
+        
+                captureSession.addInput(input)
             
             // Set the input device on the capture session.
-            captureSession.addInput(input)
+            
             
             // Initialize a AVCaptureMetadataOutput object and set it as the output device to the capture session.
             let captureMetadataOutput = AVCaptureMetadataOutput()
@@ -112,6 +116,7 @@ extension SwiftQrUtilsPlugin {
             UIApplication.shared.keyWindow!.rootViewController?.view.addSubview(qrCodeFrameView)
             UIApplication.shared.keyWindow!.rootViewController?.view.bringSubview(toFront: qrCodeFrameView)
         }
+        }
     
     }
     
@@ -135,15 +140,19 @@ extension SwiftQrUtilsPlugin {
         }
     }
     func displayQRCodeImage() {
-        let scaleX = 200 / qrcodeImage.extent.size.width
-        let scaleY = 200 / qrcodeImage.extent.size.height
+        let scaleX = 263 / qrcodeImage.extent.size.width
+        let scaleY = 263 / qrcodeImage.extent.size.height
         let transformedImage = qrcodeImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
-        //let img :UIImage = UIImage(ciImage: transformedImage)
-        //let img = UIImage(data:transformedImage,scale:1.0)
-        let imgg = UIImage(named: "ic_no_image.png")
-        let data:Data = UIImageJPEGRepresentation(imgg!, 1.0)!
-     
-        self.result!(data)
+        let img:UIImage =  convert(cmage: transformedImage)
+        let imageData: Data = UIImagePNGRepresentation(img)!
+        self.result!(imageData)
+    }
+    func convert(cmage:CIImage) -> UIImage
+    {
+        let context:CIContext = CIContext.init(options: nil)
+        let cgImage:CGImage = context.createCGImage(cmage, from: cmage.extent)!
+        let image:UIImage = UIImage.init(cgImage: cgImage)
+        return image
     }
     
     
@@ -168,6 +177,9 @@ extension SwiftQrUtilsPlugin: AVCaptureMetadataOutputObjectsDelegate {
                 self.result!(metadataObj.stringValue!)
                 qrCodeFrameView?.frame = CGRect.zero
                 videoPreviewLayer?.removeFromSuperlayer()
+                captureSession = AVCaptureSession()
+                self.captureSession.stopRunning()
+                
               
             }
         }
