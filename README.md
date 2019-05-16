@@ -25,11 +25,11 @@ import 'package:qr_utils/qr_utils.dart';
 
 ### iOS
 
-<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_ios_1.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_ios_2.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_ios_3.png">
+<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_ios_1.png"> <img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_ios_2.png"> <img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_ios_3.png">
 
 ### Android
 
-<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_android_1.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_android_2.png"> <img height="420px" src="https://github.com/flutter-devs/camera_utils/blob/master/assets/screenshots/Screenshot_android_3.png">
+<img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_android_1.png"> <img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_android_2.png"> <img height="420px" src="https://github.com/flutter-devs/qr_utils/blob/master/assets/screenshots/Screenshot_android_3.png">
 
 
 ### Usages
