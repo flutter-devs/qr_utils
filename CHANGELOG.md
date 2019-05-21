@@ -1,3 +1,13 @@
+## 0.1.3
+
+* QR code cancel handled
+* README.md updated
+
+## 0.1.2
+
+* QR code cancel handled
+* README.md updated
+
 ## 0.1.1
 
 * README.md updated

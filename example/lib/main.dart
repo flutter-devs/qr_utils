@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
                     fontSize: 24.0,
                   ),
                 ),
-                Text(_content),
+                Text(_content != null ? _content : 'Undefined'),
                 SizedBox(
                   height: 24.0,
                 ),

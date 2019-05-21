@@ -142,11 +142,9 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
         if (resultCode == RESULT_OK && requestCode == REQUEST_SCAN_QR) {
             String content = data != null ? data.getStringExtra(QR_CONTENT) : null;
             Log.v(TAG, "QR_CONTENT: " + content);
-            if (data != null) {
-                result.success(content);
-            } else {
-                Toast.makeText(activity, activity.getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
-            }
+            result.success(content);
+        } else {
+            result.success(null);
         }
         return false;
     }

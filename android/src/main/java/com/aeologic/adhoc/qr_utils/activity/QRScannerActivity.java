@@ -118,6 +118,7 @@ public class QRScannerActivity extends AppCompatActivity implements View.OnClick
             finish();
 
         } else {
+            Log.v(TAG,"handleResult(_) => Process Failed");
             Toast.makeText(QRScannerActivity.this, getString(R.string.process_failed), Toast.LENGTH_SHORT).show();
             goToBack();
         }
@@ -139,6 +140,8 @@ public class QRScannerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void goToBack() {
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
         finish();
     }
 
