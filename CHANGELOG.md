@@ -1,3 +1,7 @@
+## 0.1.4
+
+* README.md updated
+
 ## 0.1.3
 
 * QR code cancel handled

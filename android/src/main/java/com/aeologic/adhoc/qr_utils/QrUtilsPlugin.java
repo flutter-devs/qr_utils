@@ -30,6 +30,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static com.aeologic.adhoc.qr_utils.activity.QRScannerActivity.QR_CONTENT;
 
@@ -44,8 +45,8 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
     private static final String METHOD_CHANNEL = "com.aeologic.adhoc.qr_utils";
     private Result result;
     private int requestID = 0;
-    private static final int REQUEST_SCAN_QR = 101;
-    private static final int REQUEST_GENERATE_QR = 102;
+    private static final int REQUEST_SCAN_QR = 0x1000001;
+    private static final int REQUEST_GENERATE_QR = 0x1000002;
 
 
     private Activity activity;
@@ -139,12 +140,16 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(TAG, "onActivityResult()");
-        if (resultCode == RESULT_OK && requestCode == REQUEST_SCAN_QR) {
-            String content = data != null ? data.getStringExtra(QR_CONTENT) : null;
-            Log.v(TAG, "QR_CONTENT: " + content);
-            result.success(content);
-        } else {
-            result.success(null);
+        if (requestCode == REQUEST_SCAN_QR) {
+            if(resultCode == RESULT_OK ) {
+                if(data!=null) {
+                    String content=data.getStringExtra(QR_CONTENT);
+                    Log.v(TAG, "QR_CONTENT: " + content);
+                    result.success(content);
+                }
+            } else if (resultCode==RESULT_CANCELED) {
+                result.success(null);
+            }
         }
         return false;
     }

@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'qr_utils'
-  s.version          = '0.1.3'
+  s.version          = '0.1.4'
   s.summary          = 'A new Flutter QR scanner and generator plugin. This plugin is use for scanning 1D barcode and 2D QR code and generating QR code as well.'
   s.description      = <<-DESC
 A new Flutter QR scanner and generator plugin.
