@@ -21,6 +21,13 @@ class QrUtils {
     return imageFromUInt8List(uInt8list);
   }
 
+  // Returns Future<Image> after generating QR Image
+  static Future<Uint8List> generateQRByteArray(String content) async {
+    final Uint8List uInt8list =
+        await _channel.invokeMethod('generateQR', {"content": content});
+    return uInt8list;
+  }
+
   // Returns Image from base64
   static Image imageFromBase64String(String base64String) {
     return Image.memory(base64Decode(base64String));
