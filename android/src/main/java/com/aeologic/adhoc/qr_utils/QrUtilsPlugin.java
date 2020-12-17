@@ -71,7 +71,7 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
         } else if (call.method.equals("generateQR")) {
             requestID = REQUEST_GENERATE_QR;
             String content = call.argument("content");
-            Log.v(TAG,"QR_CONTENT: "+content);
+            Log.v(TAG, "QR_CONTENT: " + content);
             generateQR(content);
         } else {
             result.notImplemented();
@@ -141,13 +141,13 @@ public class QrUtilsPlugin implements MethodCallHandler, PluginRegistry.Activity
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(TAG, "onActivityResult()");
         if (requestCode == REQUEST_SCAN_QR) {
-            if(resultCode == RESULT_OK ) {
-                if(data!=null) {
-                    String content=data.getStringExtra(QR_CONTENT);
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    String content = data.getStringExtra(QR_CONTENT);
                     Log.v(TAG, "QR_CONTENT: " + content);
                     result.success(content);
                 }
-            } else if (resultCode==RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 result.success(null);
             }
         }
