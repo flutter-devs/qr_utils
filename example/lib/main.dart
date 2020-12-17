@@ -32,7 +32,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    _qrTextEditingController.text="ibhqV5ZI2TyA9lZGqAVWzA3oOQQ/J1yHp+LlSBQ/5Mct03hwurCZhu+wFBCRUvRSLfvInd/id/qLEbo4TMxpYWkm2KzoElDUqUl/MfcOXBur/LpFk/FhHHYIrDrENOgoTCqUsbt1r0y3ucbF5DlJofmw9JMw3YRzZo1A1DiAWmpe7FuslhuEiiXzzzcDLiFsTbE9ba5/oVcAOAsYWvTOar3fGUHKCuDcSp/i+OxzDmUni+o7OnOq3GfeoMQkx0YlKZNu7yvVmAJq+bHU3v3B9fdglxZqJc3dMx+0iECuv07D19wudaeu0Cco5lpOgUZu74dNZ4zumZxaJOJnH4BSCg==";
+    _qrTextEditingController.text =
+        "ibhqV5ZI2TyA9lZGqAVWzA3oOQQ/J1yHp+LlSBQ/5Mct03hwurCZhu+wFBCRUvRSLfvInd/id/qLEbo4TMxpYWkm2KzoElDUqUl/MfcOXBur/LpFk/FhHHYIrDrENOgoTCqUsbt1r0y3ucbF5DlJofmw9JMw3YRzZo1A1DiAWmpe7FuslhuEiiXzzzcDLiFsTbE9ba5/oVcAOAsYWvTOar3fGUHKCuDcSp/i+OxzDmUni+o7OnOq3GfeoMQkx0YlKZNu7yvVmAJq+bHU3v3B9fdglxZqJc3dMx+0iECuv07D19wudaeu0Cco5lpOgUZu74dNZ4zumZxaJOJnH4BSCg==";
     return MaterialApp(
       home: Scaffold(
         key: _scaffoldKey,

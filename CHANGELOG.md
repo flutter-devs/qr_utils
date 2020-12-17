@@ -1,3 +1,7 @@
+## 0.1.5
+
+* minor changes
+
 ## 0.1.4
 
 * README.md updated
